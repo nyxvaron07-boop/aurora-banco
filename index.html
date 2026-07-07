@@ -1,0 +1,1793 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0B0B0B" />
+<title>AURORA · Banco Mágico</title>
+<link rel="manifest" href='data:application/manifest+json,{"name":"AURORA Banco Mágico","short_name":"AURORA","start_url":".","display":"standalone","background_color":"#0B0B0B","theme_color":"#0B0B0B","icons":[{"src":"data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 fill=%22%230B0B0B%22/><text x=%2232%22 y=%2242%22 font-size=%2236%22 text-anchor=%22middle%22 fill=%22%23C9A24C%22>A</text></svg>","sizes":"64x64","type":"image/svg+xml"}]}' />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          display: ['Cinzel', 'serif'],
+          serifm: ['Cormorant Garamond', 'serif'],
+          sans: ['Inter', 'ui-sans-serif', 'system-ui'],
+        },
+        colors: {
+          ink: '#0B0B0B',
+          graphite: '#141418',
+          arcane: '#1a1030',
+          violet1: '#2a1450',
+          violet2: '#7c3aed',
+          amethyst: '#a78bfa',
+          gold: '#C9A24C',
+          goldbright: '#F1D08A',
+          night: '#0a0f2e',
+        },
+        boxShadow: {
+          glow: '0 0 30px rgba(167,139,250,.35), 0 0 60px rgba(124,58,237,.25)',
+          gold: '0 0 20px rgba(201,162,76,.35)',
+          card: '0 20px 60px -20px rgba(124,58,237,.35)',
+        },
+      }
+    }
+  }
+</script>
+<style>
+  :root { --safe-b: env(safe-area-inset-bottom, 0px); --safe-t: env(safe-area-inset-top, 0px); }
+  html, body { background: #050208; color: #ece9f7; }
+  body {
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    background:
+      radial-gradient(1200px 600px at 10% -10%, rgba(124,58,237,.25), transparent 60%),
+      radial-gradient(900px 500px at 100% 10%, rgba(59,130,246,.18), transparent 60%),
+      radial-gradient(700px 500px at 50% 110%, rgba(201,162,76,.15), transparent 60%),
+      linear-gradient(180deg, #05030b 0%, #0B0B0B 60%, #05030b 100%);
+    background-attachment: fixed;
+  }
+  .font-display { font-family: 'Cinzel', serif; letter-spacing: .08em; }
+  .font-serifm { font-family: 'Cormorant Garamond', serif; }
+  .glass {
+    background: linear-gradient(135deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    border: 1px solid rgba(167,139,250,.18);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 20px 60px -20px rgba(124,58,237,.35);
+  }
+  .glass-strong {
+    background: linear-gradient(135deg, rgba(30,20,60,.75), rgba(10,6,20,.75));
+    backdrop-filter: blur(24px) saturate(150%);
+    -webkit-backdrop-filter: blur(24px) saturate(150%);
+    border: 1px solid rgba(201,162,76,.22);
+  }
+  .rune-border {
+    position: relative;
+    border-radius: 1rem;
+  }
+  .rune-border::before {
+    content: '';
+    position: absolute; inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(201,162,76,.6), rgba(167,139,250,.5), rgba(124,58,237,.6));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    pointer-events: none;
+  }
+  .btn-magic {
+    position: relative;
+    background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 60%, #1a1030 100%);
+    color: #fff;
+    border: 1px solid rgba(201,162,76,.45);
+    box-shadow: 0 10px 30px -10px rgba(124,58,237,.7), inset 0 1px 0 rgba(255,255,255,.15);
+    transition: transform .2s ease, box-shadow .3s ease, filter .3s;
+  }
+  .btn-magic:hover { transform: translateY(-1px); box-shadow: 0 15px 40px -10px rgba(167,139,250,.8), 0 0 30px rgba(201,162,76,.35); filter: brightness(1.08); }
+  .btn-gold {
+    background: linear-gradient(135deg, #F1D08A 0%, #C9A24C 60%, #7a5b1e 100%);
+    color: #1a0f00;
+    border: 1px solid rgba(255,230,170,.6);
+    box-shadow: 0 10px 30px -10px rgba(201,162,76,.7), inset 0 1px 0 rgba(255,255,255,.4);
+    font-weight: 700;
+  }
+  .btn-ghost { border: 1px solid rgba(167,139,250,.3); background: rgba(255,255,255,.03); }
+  .btn-ghost:hover { background: rgba(167,139,250,.08); }
+
+  .input {
+    background: rgba(10,6,20,.7);
+    border: 1px solid rgba(167,139,250,.25);
+    color: #f4f0ff;
+    border-radius: .75rem;
+    padding: .75rem 1rem;
+    width: 100%;
+    transition: box-shadow .2s, border-color .2s;
+  }
+  .input:focus { outline: none; border-color: #C9A24C; box-shadow: 0 0 0 3px rgba(201,162,76,.2), 0 0 24px rgba(167,139,250,.25); }
+  .input::placeholder { color: #8a80a8; }
+  .label { font-size: .72rem; text-transform: uppercase; letter-spacing: .18em; color: #b8aee0; }
+
+  /* Particles */
+  .particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .particle {
+    position: absolute; bottom: -10px;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: radial-gradient(circle, #F1D08A 0%, rgba(201,162,76,.4) 50%, transparent 70%);
+    box-shadow: 0 0 12px rgba(201,162,76,.7);
+    animation: rise linear infinite;
+    opacity: .8;
+  }
+  @keyframes rise {
+    0% { transform: translateY(0) translateX(0) scale(.6); opacity: 0; }
+    10% { opacity: .8; }
+    100% { transform: translateY(-110vh) translateX(var(--drift, 20px)) scale(1); opacity: 0; }
+  }
+  @keyframes floaty { 0%,100% { transform: translateY(0);} 50% { transform: translateY(-8px);} }
+  .floaty { animation: floaty 6s ease-in-out infinite; }
+  @keyframes shimmer {
+    0% { background-position: -400px 0; }
+    100% { background-position: 400px 0; }
+  }
+  .shimmer-text {
+    background: linear-gradient(90deg, #C9A24C 0%, #F1D08A 25%, #fff8dc 50%, #F1D08A 75%, #C9A24C 100%);
+    background-size: 400px 100%;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: shimmer 4s linear infinite;
+  }
+  .fade-in { animation: fadeIn .5s ease both; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px);} to { opacity: 1; transform: none;} }
+
+  .cursor-glow {
+    position: fixed; width: 400px; height: 400px; pointer-events: none;
+    background: radial-gradient(circle, rgba(167,139,250,.14), transparent 60%);
+    transform: translate(-50%,-50%); z-index: 1; transition: opacity .3s;
+    mix-blend-mode: screen;
+  }
+
+  .rune-badge { font-family: 'Cinzel', serif; letter-spacing: .2em; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb { background: linear-gradient(#7c3aed,#C9A24C); border-radius: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+
+  /* House colors — HOGTWARE: Lunaris · Draconis · Solaris */
+  .house-lunaris  { background: linear-gradient(135deg,#0b1638,#5b7dd6 60%,#c9d8ff); color:#f8fbff; }
+  .house-draconis { background: linear-gradient(135deg,#2a0810,#8b0e2a 55%,#e63757); color:#fff; }
+  .house-solaris  { background: linear-gradient(135deg,#3a1e02,#c9781f 55%,#f5c518); color:#2a1500; }
+
+  /* Chart bars */
+  .bar { background: linear-gradient(180deg, #F1D08A 0%, #C9A24C 40%, #7c3aed 100%); border-radius: 6px 6px 2px 2px; box-shadow: 0 0 12px rgba(167,139,250,.5); }
+
+  .divider-mag { height:1px; background: linear-gradient(90deg, transparent, rgba(201,162,76,.5), transparent); }
+
+  .nav-item.active { background: linear-gradient(135deg, rgba(124,58,237,.25), rgba(201,162,76,.08)); border-left: 2px solid #C9A24C; color:#F1D08A; }
+
+  .safe-bottom { padding-bottom: calc(1rem + var(--safe-b)); }
+  .safe-top { padding-top: calc(.5rem + var(--safe-t)); }
+
+  /* Toast */
+  .toast { animation: toastIn .35s ease, toastOut .4s ease 3.2s forwards; }
+  @keyframes toastIn { from { transform: translateY(20px); opacity: 0; } to { transform: none; opacity: 1; } }
+  @keyframes toastOut { to { transform: translateY(20px); opacity: 0; } }
+
+  /* Rune SVG spin */
+  .spin-slow { animation: spin 30s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg);} }
+
+  .card-hover { transition: transform .3s, box-shadow .3s; }
+  .card-hover:hover { transform: translateY(-3px); box-shadow: 0 25px 60px -20px rgba(167,139,250,.5); }
+
+  .badge { display:inline-flex; align-items:center; gap:.35rem; padding:.2rem .6rem; border-radius: 999px; font-size:.7rem; font-weight:600; letter-spacing:.06em; }
+  .badge-gold { background: rgba(201,162,76,.15); color:#F1D08A; border:1px solid rgba(201,162,76,.4); }
+  .badge-violet { background: rgba(124,58,237,.15); color:#c4b5fd; border:1px solid rgba(124,58,237,.4); }
+  .badge-emerald { background: rgba(16,185,129,.12); color:#6ee7b7; border:1px solid rgba(16,185,129,.35); }
+  .badge-rose { background: rgba(244,63,94,.12); color:#fda4af; border:1px solid rgba(244,63,94,.35); }
+
+  @media (max-width: 768px) {
+    .desktop-only { display:none !important; }
+  }
+  @media (min-width: 769px) {
+    .mobile-only { display:none !important; }
+  }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- Cursor glow -->
+<div id="cursorGlow" class="cursor-glow hidden md:block"></div>
+
+<!-- Particles -->
+<div id="particles" class="particles"></div>
+
+<!-- App root -->
+<div id="app" class="relative z-10"></div>
+
+<!-- Toast container -->
+<div id="toasts" class="fixed z-[100] bottom-4 right-4 flex flex-col gap-2 max-w-sm" style="bottom: calc(1rem + var(--safe-b));"></div>
+
+<script>
+/* =========================================================================
+   AURORA · Banco Mágico  — Single-file PWA prototype
+   Cuenta admin: NyxVaron / 0798
+   Creado y supervisado por Juliancito Riddle • NyxVaron
+   ========================================================================= */
+
+// ---------- CONFIGURACIÓN SUPABASE ----------
+const SUPABASE_URL = 'https://swkbwwxqtmdioabdefow.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3a2J3d3hxdG1kaW9hYmRlZm93Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0MzA3NzksImV4cCI6MjA5OTAwNjc3OX0.VmUyZoZnpDf2x6SenSsGD3SLvM6IDnyS-vFow_wMRGg';
+// -------------------------------------------------------------
+
+// ---------- STATE ----------
+const HOUSES = ['Lunaris','Draconis','Solaris'];
+const HOUSE_CLASS = { Lunaris:'house-lunaris', Draconis:'house-draconis', Solaris:'house-solaris' };
+const HOUSE_ICON  = { Lunaris:'🌙', Draconis:'🐉', Solaris:'☀️' };
+
+const DEFAULT_STATE = {
+  users: [
+    { id:'u-admin', username:'NyxVaron', password:'0798', role:'admin', name:'NyxVaron', createdAt: Date.now() },
+    { id:'u-duende-1', username:'Grimwold', password:'duende', role:'duende', name:'Grimwold Piedrafina', createdAt: Date.now() },
+  ],
+  students: [
+    { id:'AUR-0001', name:'Elara Nocturna',  house:'Lunaris',  status:'Activo', enrolled: Date.now()-86400000*120, notes:'Prefecta',   avatar:'🌙', photo:'', balance: 1245, history:[] },
+    { id:'AUR-0002', name:'Cassius Emberly', house:'Draconis', status:'Activo', enrolled: Date.now()-86400000*300, notes:'Buscador',   avatar:'🔥', photo:'', balance: 780,  history:[] },
+    { id:'AUR-0003', name:'Seraphine Moss',  house:'Solaris',  status:'Activo', enrolled: Date.now()-86400000*60,  notes:'',           avatar:'🌿', photo:'', balance: 320,  history:[] },
+    { id:'AUR-0004', name:'Draven Malachai', house:'Draconis', status:'Activo', enrolled: Date.now()-86400000*400, notes:'Delegado',   avatar:'🐍', photo:'', balance: 2100, history:[] },
+  ],
+  movements: [],
+  depositRequests: [],
+  notifications: [
+    { id:'n1', type:'info', title:'Bienvenido a AURORA', msg:'La bóveda mágica ha despertado.', ts: Date.now()-3600_000, read:false },
+    { id:'n2', type:'gold', title:'Depósito recibido', msg:'Elara Nocturna +250 galeones.', ts: Date.now()-1800_000, read:false },
+  ],
+  session: null,
+};
+
+const STORE_KEY = 'aurora-hrtan-v2';
+
+// ---------- FUNCIONES DE CARGA/GUARDADO CON SUPABASE ----------
+let state = null;
+let isSaving = false;
+let syncInterval = null;
+
+async function loadState() {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/app_state?id=eq.aurora&select=data`, {
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`
+      }
+    });
+    const data = await res.json();
+    if (data && data.length > 0 && data[0].data) {
+      return data[0].data;
+    } else {
+      // Si no existe, crear el estado inicial
+      await saveState(structuredClone(DEFAULT_STATE));
+      return structuredClone(DEFAULT_STATE);
+    }
+  } catch (e) {
+    console.warn('Error cargando desde Supabase, usando estado local:', e);
+    // Intentar cargar desde localStorage como respaldo
+    try {
+      const raw = localStorage.getItem(STORE_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch(e2) {}
+    return structuredClone(DEFAULT_STATE);
+  }
+}
+
+async function saveState(newState) {
+  if (isSaving) return;
+  isSaving = true;
+  try {
+    const stateToSave = newState || state;
+    // Guardar en Supabase (UPSERT)
+    await fetch(`${SUPABASE_URL}/rest/v1/app_state`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify({
+        id: 'aurora',
+        data: stateToSave,
+        updated_at: new Date().toISOString()
+      })
+    });
+    // Guardar también en localStorage como respaldo
+    localStorage.setItem(STORE_KEY, JSON.stringify(stateToSave));
+  } catch (e) {
+    console.warn('Error guardando en Supabase, guardando localmente:', e);
+    localStorage.setItem(STORE_KEY, JSON.stringify(newState || state));
+  } finally {
+    isSaving = false;
+  }
+}
+
+// Función para cargar el estado inicial
+async function initState() {
+  state = await loadState();
+  // Migración de seguridad
+  if (!Array.isArray(state.depositRequests)) state.depositRequests = [];
+  state.students?.forEach(s => {
+    if (s.photo===undefined) s.photo='';
+  });
+  state.users?.forEach(u => {
+    if (u.photo===undefined) u.photo='';
+    if (u.bio===undefined) u.bio='';
+  });
+  // Iniciar sincronización en tiempo real
+  startRealtimeSync();
+  // Sincronizar cada 5 segundos como respaldo
+  syncInterval = setInterval(async () => {
+    if (!isSaving) {
+      try {
+        const freshState = await loadState();
+        if (freshState) {
+          // Solo actualizar si hay cambios significativos
+          const currentJson = JSON.stringify(state);
+          const freshJson = JSON.stringify(freshState);
+          if (currentJson !== freshJson) {
+            state = freshState;
+            render();
+            toast('🔄 Datos sincronizados desde la nube', 'info');
+          }
+        }
+      } catch(e) {}
+    }
+  }, 5000);
+}
+
+// Iniciar suscripción a cambios en tiempo real (WebSocket)
+function startRealtimeSync() {
+  try {
+    // Usar el canal de tiempo real de Supabase
+    const ws = new WebSocket(`wss://${SUPABASE_URL.replace('https://', '').replace('http://', '')}/realtime/v1/websocket?apikey=${SUPABASE_KEY}`);
+    ws.onopen = () => {
+      ws.send(JSON.stringify({
+        event: 'phx_join',
+        payload: {},
+        ref: '1',
+        topic: 'realtime:app_state'
+      }));
+    };
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.event === 'postgres_changes' && data.payload?.new?.id === 'aurora') {
+          // Recargar datos cuando hay cambio en la BD
+          loadState().then(freshState => {
+            if (freshState) {
+              const currentJson = JSON.stringify(state);
+              const freshJson = JSON.stringify(freshState);
+              if (currentJson !== freshJson) {
+                state = freshState;
+                render();
+                toast('✨ Datos actualizados en tiempo real', 'gold');
+              }
+            }
+          });
+        }
+      } catch(e) {}
+    };
+  } catch(e) {
+    console.log('Tiempo real no disponible, usando polling');
+  }
+}
+
+// ---------- UTIL ----------
+const $ = (sel, root=document) => root.querySelector(sel);
+const $$ = (sel, root=document) => [...root.querySelectorAll(sel)];
+const fmt = n => new Intl.NumberFormat('es-CO').format(Math.round(n));
+const fmtDate = ts => new Date(ts).toLocaleString('es-CO', { dateStyle:'medium', timeStyle:'short' });
+function uid(prefix='id') { return prefix+'-'+Math.random().toString(36).slice(2,9); }
+function nextStudentId() {
+  const nums = state.students.map(s => parseInt(s.id.split('-')[1])||0);
+  const n = (Math.max(0, ...nums) + 1).toString().padStart(4,'0');
+  return 'AUR-'+n;
+}
+function toast(msg, kind='info') {
+  const el = document.createElement('div');
+  const colors = { info:'badge-violet', ok:'badge-emerald', err:'badge-rose', gold:'badge-gold' };
+  el.className = 'toast glass-strong rune-border rounded-xl px-4 py-3 flex items-start gap-3 shadow-glow';
+  el.innerHTML = `<div class="badge ${colors[kind]||'badge-violet'}">✦</div><div class="text-sm text-violet-100">${msg}</div>`;
+  $('#toasts').appendChild(el);
+  setTimeout(()=> el.remove(), 3800);
+}
+function notify(title, msg, type='info') {
+  state.notifications.unshift({ id: uid('n'), title, msg, type, ts: Date.now(), read:false });
+  saveState(state);
+}
+
+// Particles
+function initParticles() {
+  const c = $('#particles');
+  c.innerHTML='';
+  const n = window.innerWidth < 768 ? 22 : 45;
+  for (let i=0;i<n;i++) {
+    const p = document.createElement('div');
+    p.className='particle';
+    p.style.left = Math.random()*100+'%';
+    p.style.setProperty('--drift', (Math.random()*80-40)+'px');
+    p.style.animationDuration = (10 + Math.random()*20)+'s';
+    p.style.animationDelay = (-Math.random()*20)+'s';
+    p.style.width = p.style.height = (3+Math.random()*5)+'px';
+    if (Math.random() < .3) p.style.background = 'radial-gradient(circle, #a78bfa 0%, rgba(124,58,237,.4) 50%, transparent 70%)';
+    c.appendChild(p);
+  }
+}
+initParticles();
+window.addEventListener('resize', initParticles);
+
+// Cursor glow
+document.addEventListener('mousemove', e => {
+  const g = $('#cursorGlow');
+  g.style.left = e.clientX+'px';
+  g.style.top = e.clientY+'px';
+});
+
+// ---------- ICONS (inline SVG) ----------
+const I = {
+  rune: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-full h-full"><path d="M12 2v20M4 6l16 12M20 6L4 18"/></svg>`,
+  coin: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-full h-full"><circle cx="12" cy="12" r="9"/><path d="M9 9h4a2 2 0 010 4H9m0 0h5"/></svg>`,
+  vault: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-full h-full"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="12" cy="12" r="3.5"/><path d="M12 4v2M12 18v2M4 12h2M18 12h2"/></svg>`,
+  wand: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-full h-full"><path d="M3 21L15 9M17 3l1 3 3 1-3 1-1 3-1-3-3-1 3-1 1-3z"/></svg>`,
+  scroll: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-full h-full"><path d="M6 3h11a3 3 0 013 3v13a3 3 0 01-3 3H8a3 3 0 01-3-3V6a3 3 0 013-3zm0 0v18M18 6h3"/></svg>`,
+  key: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-full h-full"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3"/></svg>`,
+  bell: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-full h-full"><path d="M6 8a6 6 0 0112 0c0 7 3 8 3 8H3s3-1 3-8zM10 21a2 2 0 004 0"/></svg>`,
+  search: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-full h-full"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>`,
+  users: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-full h-full"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-7 7-7s7 3 7 7M17 11a3 3 0 100-6M22 21c0-3-2-5-4-6"/></svg>`,
+  arrow: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-full h-full"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`,
+  plus: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-full h-full"><path d="M12 5v14M5 12h14"/></svg>`,
+  book: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-full h-full"><path d="M4 4h11a4 4 0 014 4v12H8a4 4 0 01-4-4V4z"/><path d="M4 4v13"/></svg>`,
+  crystal: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-full h-full"><path d="M12 2l7 8-7 12L5 10l7-8zM5 10h14M12 2v20"/></svg>`,
+  star: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-full h-full"><path d="M12 3l2.5 6 6.5.5-5 4.5 1.5 6.5L12 17l-5.5 3.5L8 14l-5-4.5 6.5-.5L12 3z"/></svg>`,
+  bank: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-full h-full"><path d="M3 10L12 3l9 7M5 10v9M19 10v9M9 10v9M15 10v9M2 21h20"/></svg>`,
+  gear: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-full h-full"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 00-.1-1l2-1.5-2-3.5-2.4.8a7 7 0 00-1.7-1L14 3h-4l-.8 2.8a7 7 0 00-1.7 1L5.1 6 3.1 9.5l2 1.5a7 7 0 000 2l-2 1.5 2 3.5 2.4-.8a7 7 0 001.7 1L10 21h4l.8-2.8a7 7 0 001.7-1l2.4.8 2-3.5-2-1.5c.06-.3.1-.66.1-1z"/></svg>`,
+  logout: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-full h-full"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>`,
+  home: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-full h-full"><path d="M3 11l9-8 9 8v10a2 2 0 01-2 2h-4v-6h-6v6H5a2 2 0 01-2-2V11z"/></svg>`,
+};
+function icon(name, cls='w-5 h-5') { return `<span class="inline-block ${cls}">${I[name]||''}</span>`; }
+
+// ---------- LOGO ----------
+function LOGO(size=64) {
+  return `<div class="relative" style="width:${size}px;height:${size}px">
+    <div class="absolute inset-0 rounded-full spin-slow" style="background: conic-gradient(from 0deg, transparent, rgba(201,162,76,.6), transparent 70%);"></div>
+    <div class="absolute inset-[3px] rounded-full glass-strong flex items-center justify-center">
+      <span class="shimmer-text font-display font-bold" style="font-size:${size*0.42}px">A</span>
+    </div>
+    <div class="absolute -inset-1 rounded-full pointer-events-none" style="box-shadow: 0 0 30px rgba(201,162,76,.35), inset 0 0 20px rgba(167,139,250,.3);"></div>
+  </div>`;
+}
+
+// ---------- FOOTER ----------
+function FOOTER() {
+  return `<footer class="mt-8 pb-4 text-center text-[11px] tracking-[0.22em] uppercase text-violet-300/50 safe-bottom">
+    ✦ Creado y supervisado por <span class="text-gold">Juliancito Riddle</span> • <span class="text-amethyst">NyxVaron</span> ✦
+  </footer>`;
+}
+
+// ---------- ROUTER / RENDER ----------
+let route = 'dashboard';
+let selectedStudentId = null;
+
+function render() {
+  const app = $('#app');
+  if (!state.session) { app.innerHTML = viewLogin(); wireLogin(); return; }
+  const user = state.users.find(u => u.id === state.session.userId);
+  if (!user) { state.session = null; saveState(state); render(); return; }
+
+  if (user.role === 'estudiante') {
+    app.innerHTML = viewStudentPortal(user);
+    wireStudentPortal();
+    return;
+  }
+
+  app.innerHTML = shell(user);
+  wireShell();
+  const main = $('#main');
+  switch(route) {
+    case 'dashboard': main.innerHTML = viewDashboard(); wireDashboard(); break;
+    case 'students': main.innerHTML = viewStudents(); wireStudents(); break;
+    case 'student': main.innerHTML = viewStudentDetail(); wireStudentDetail(); break;
+    case 'deposits': main.innerHTML = viewOperation('deposit'); wireOperation('deposit'); break;
+    case 'withdrawals': main.innerHTML = viewOperation('withdraw'); wireOperation('withdraw'); break;
+    case 'transfers': main.innerHTML = viewTransfer(); wireTransfer(); break;
+    case 'purchases': main.innerHTML = viewOperation('purchase'); wireOperation('purchase'); break;
+    case 'history': main.innerHTML = viewHistory(); wireHistory(); break;
+    case 'requests': main.innerHTML = viewRequests(); wireRequests(); break;
+    case 'notifications': main.innerHTML = viewNotifications(); break;
+    case 'admin': main.innerHTML = viewAdmin(); wireAdmin(); break;
+    case 'profile': main.innerHTML = viewProfile(); wireProfile(); break;
+    default: main.innerHTML = viewDashboard(); wireDashboard();
+  }
+}
+
+// ---------- LOGIN VIEW ----------
+function viewLogin() {
+  return `
+  <div class="min-h-screen flex items-center justify-center p-4 safe-top safe-bottom fade-in">
+    <div class="w-full max-w-md">
+      <div class="glass-strong rune-border rounded-3xl p-8 md:p-10 shadow-glow relative overflow-hidden">
+        <div class="absolute -top-24 -right-24 w-64 h-64 rounded-full opacity-40" style="background: radial-gradient(circle, rgba(167,139,250,.6), transparent 60%);"></div>
+        <div class="absolute -bottom-24 -left-24 w-72 h-72 rounded-full opacity-30" style="background: radial-gradient(circle, rgba(201,162,76,.5), transparent 60%);"></div>
+
+        <div class="relative flex flex-col items-center text-center">
+          <div class="floaty">${LOGO(84)}</div>
+          <h1 class="mt-5 font-display text-2xl md:text-3xl tracking-[0.28em] shimmer-text">AURORA</h1>
+          <p class="mt-1 font-serifm italic text-violet-200/80 text-lg">Banco Mágico</p>
+          <div class="mt-2 text-[10px] tracking-[0.4em] text-gold/70">✦ HOGTWARE REVOLUTION ✦</div>
+        </div>
+
+        <form id="loginForm" class="mt-8 space-y-5 relative">
+          <div>
+            <label class="label">Nombre de hechicero</label>
+            <input class="input mt-2" name="username" placeholder="Ej. NyxVaron" autocomplete="username" required>
+          </div>
+          <div>
+            <label class="label">Palabra clave arcana</label>
+            <input class="input mt-2" name="password" type="password" placeholder="••••" autocomplete="current-password" required>
+          </div>
+          <button class="btn-magic w-full py-3.5 rounded-xl font-display tracking-[0.24em] text-sm">
+            <span class="inline-flex items-center gap-2 justify-center">${icon('key','w-4 h-4')} INGRESAR AL GRIMORIO</span>
+          </button>
+          <div class="text-center text-[11px] text-violet-300/60">
+            ¿Nuevo aquí? Un duende o el archimago debe crear tu cuenta.
+          </div>
+        </form>
+      </div>
+      ${FOOTER()}
+    </div>
+  </div>`;
+}
+function wireLogin() {
+  $('#loginForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const u = fd.get('username').toString().trim();
+    const p = fd.get('password').toString();
+    const user = state.users.find(x => x.username.toLowerCase() === u.toLowerCase() && x.password === p);
+    if (!user) { toast('Credenciales inválidas. La bóveda permanece sellada.', 'err'); return; }
+    state.session = { userId: user.id, role: user.role };
+    saveState(state);
+    toast(`Bienvenido, ${user.name} ✦`, 'gold');
+    route = user.role === 'estudiante' ? 'portal' : 'dashboard';
+    render();
+  });
+}
+
+// ---------- SHELL ----------
+const NAV_ADMIN = [
+  { key:'dashboard', label:'Bóveda Central', icon:'home' },
+  { key:'students', label:'Estudiantes', icon:'users' },
+  { key:'deposits', label:'Depósitos', icon:'coin' },
+  { key:'withdrawals', label:'Retiros', icon:'arrow' },
+  { key:'transfers', label:'Transferencias', icon:'wand' },
+  { key:'purchases', label:'Compras', icon:'scroll' },
+  { key:'requests', label:'Solicitudes', icon:'crystal' },
+  { key:'history', label:'Historial', icon:'book' },
+  { key:'notifications', label:'Alertas', icon:'bell' },
+  { key:'profile', label:'Mi Perfil', icon:'star' },
+  { key:'admin', label:'Administración', icon:'gear' },
+];
+const NAV_DUENDE = NAV_ADMIN.filter(n => n.key !== 'admin');
+
+function shell(user) {
+  const nav = user.role === 'admin' ? NAV_ADMIN : NAV_DUENDE;
+  const unread = state.notifications.filter(n=>!n.read).length;
+  const pendingReq = state.depositRequests.filter(r=>r.status==='pending').length;
+  return `
+  <div class="min-h-screen flex">
+    <!-- Sidebar desktop -->
+    <aside class="desktop-only w-64 shrink-0 glass-strong border-r border-violet-500/20 min-h-screen p-4 sticky top-0 h-screen">
+      <div class="flex items-center gap-3 px-2 py-3">
+        ${LOGO(44)}
+        <div>
+          <div class="font-display text-sm tracking-[0.22em] shimmer-text">AURORA</div>
+          <div class="text-[10px] tracking-[0.2em] text-violet-300/70">BANCO MÁGICO</div>
+        </div>
+      </div>
+      <div class="divider-mag my-3"></div>
+      <nav class="flex flex-col gap-1">
+        ${nav.map(n => `
+          <button data-route="${n.key}" class="nav-item ${route===n.key?'active':''} text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-violet-100/80 hover:text-white hover:bg-violet-500/10 transition">
+            <span class="w-5 h-5 text-gold">${I[n.icon]}</span>
+            <span>${n.label}</span>
+            ${n.key==='notifications' && unread ? `<span class="ml-auto badge badge-gold">${unread}</span>`:''}
+            ${n.key==='requests' && pendingReq ? `<span class="ml-auto badge badge-gold">${pendingReq}</span>`:''}
+          </button>`).join('')}
+      </nav>
+      <div class="divider-mag my-3"></div>
+      <div class="glass rounded-xl p-3 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-violet-600 to-indigo-900 flex items-center justify-center text-lg shadow-glow">✦</div>
+        <div class="min-w-0 flex-1">
+          <div class="text-sm font-semibold truncate">${user.name}</div>
+          <div class="text-[10px] uppercase tracking-widest text-gold">${user.role}</div>
+        </div>
+        <button id="logoutBtn" class="text-violet-300 hover:text-gold" title="Cerrar sesión">${icon('logout')}</button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <div class="flex-1 min-w-0 flex flex-col">
+      <!-- Topbar -->
+      <header class="sticky top-0 z-30 glass-strong border-b border-violet-500/15 safe-top">
+        <div class="flex items-center gap-3 px-4 md:px-6 py-3">
+          <button class="mobile-only p-2 -ml-2 text-gold" id="openMenu">${icon('rune','w-6 h-6')}</button>
+          <div class="mobile-only flex items-center gap-2">${LOGO(34)}<span class="font-display text-xs tracking-[0.2em] shimmer-text">AURORA</span></div>
+          <div class="hidden md:flex items-center gap-2 flex-1 max-w-lg">
+            <div class="flex items-center gap-2 w-full glass rounded-xl px-3 py-2">
+              <span class="text-gold w-4 h-4">${I.search}</span>
+              <input id="globalSearch" class="bg-transparent outline-none w-full text-sm placeholder:text-violet-300/50" placeholder="Buscar estudiantes, movimientos, casas...">
+            </div>
+          </div>
+          <div class="flex-1 md:hidden"></div>
+          <button data-route="notifications" class="relative p-2 text-violet-200 hover:text-gold">
+            ${icon('bell')}
+            ${unread ? `<span class="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-gold text-[9px] text-black grid place-items-center font-bold">${unread}</span>`:''}
+          </button>
+          <div class="hidden md:flex items-center gap-2 text-xs text-violet-200/80">
+            <span class="rune-badge text-gold">${user.name}</span>
+          </div>
+        </div>
+        <!-- Mobile search -->
+        <div class="md:hidden px-4 pb-3">
+          <div class="flex items-center gap-2 glass rounded-xl px-3 py-2">
+            <span class="text-gold w-4 h-4">${I.search}</span>
+            <input id="globalSearchM" class="bg-transparent outline-none w-full text-sm placeholder:text-violet-300/50" placeholder="Buscar en el banco mágico...">
+          </div>
+        </div>
+      </header>
+
+      <!-- Mobile drawer -->
+      <div id="drawer" class="mobile-only fixed inset-0 z-40 hidden">
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" id="drawerBg"></div>
+        <aside class="absolute left-0 top-0 h-full w-72 glass-strong border-r border-violet-500/30 p-4 safe-top">
+          <div class="flex items-center gap-3">${LOGO(44)}<div><div class="font-display text-sm tracking-[0.22em] shimmer-text">AURORA</div><div class="text-[10px] tracking-[0.2em] text-violet-300/70">BANCO MÁGICO</div></div></div>
+          <div class="divider-mag my-3"></div>
+          <nav class="flex flex-col gap-1">
+            ${nav.map(n => `<button data-route="${n.key}" class="nav-item ${route===n.key?'active':''} text-left flex items-center gap-3 px-3 py-3 rounded-lg text-sm"><span class="w-5 h-5 text-gold">${I[n.icon]}</span>${n.label}</button>`).join('')}
+          </nav>
+          <div class="divider-mag my-3"></div>
+          <div class="glass rounded-xl p-3 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-violet-600 to-indigo-900 grid place-items-center">✦</div>
+            <div class="flex-1 min-w-0"><div class="text-sm truncate">${user.name}</div><div class="text-[10px] uppercase tracking-widest text-gold">${user.role}</div></div>
+            <button id="logoutBtn2" class="text-violet-300">${icon('logout')}</button>
+          </div>
+        </aside>
+      </div>
+
+      <main id="main" class="flex-1 px-4 md:px-8 py-6 fade-in"></main>
+      ${FOOTER()}
+    </div>
+  </div>`;
+}
+
+function wireShell() {
+  $$('[data-route]').forEach(b => b.addEventListener('click', () => {
+    route = b.dataset.route;
+    if (route !== 'student') selectedStudentId = null;
+    $('#drawer')?.classList.add('hidden');
+    render();
+  }));
+  $('#openMenu')?.addEventListener('click', ()=> $('#drawer').classList.remove('hidden'));
+  $('#drawerBg')?.addEventListener('click', ()=> $('#drawer').classList.add('hidden'));
+  $('#logoutBtn')?.addEventListener('click', doLogout);
+  $('#logoutBtn2')?.addEventListener('click', doLogout);
+  [$('#globalSearch'), $('#globalSearchM')].forEach(inp => inp && inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      const q = e.target.value.trim();
+      if (!q) return;
+      route = 'history';
+      render();
+      setTimeout(()=>{ const s = $('#historySearch'); if (s){ s.value = q; s.dispatchEvent(new Event('input')); } }, 50);
+    }
+  }));
+}
+function doLogout(){ state.session = null; saveState(state); route='dashboard'; render(); toast('Sesión sellada. Hasta pronto.','info'); }
+
+// ---------- DASHBOARD ----------
+function computeStats() {
+  const totalBalance = state.students.reduce((a,s)=>a+s.balance, 0);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const todayMs = today.getTime();
+  const todays = state.movements.filter(m => m.ts >= todayMs);
+  const depositsToday = todays.filter(m=>m.kind==='deposit').reduce((a,m)=>a+m.amount,0);
+  const transfersToday = todays.filter(m=>m.kind==='transfer_out').length;
+  const purchasesToday = todays.filter(m=>m.kind==='purchase').reduce((a,m)=>a+m.amount,0);
+  return { totalBalance, students: state.students.length, accounts: state.students.length, depositsToday, transfersToday, purchasesToday };
+}
+function viewDashboard() {
+  const s = computeStats();
+  const recent = [...state.movements].sort((a,b)=>b.ts-a.ts).slice(0,8);
+  const byHouse = HOUSES.map(h => ({ h, total: state.students.filter(x=>x.house===h).reduce((a,x)=>a+x.balance,0) }));
+  const maxH = Math.max(1, ...byHouse.map(x=>x.total));
+  const last7 = Array.from({length:7}).map((_,i)=>{
+    const d = new Date(); d.setDate(d.getDate()-(6-i)); d.setHours(0,0,0,0);
+    const next = d.getTime()+86400000;
+    const v = state.movements.filter(m=>m.ts>=d.getTime()&&m.ts<next).reduce((a,m)=>a+m.amount,0);
+    return { d, v };
+  });
+  const maxV = Math.max(1, ...last7.map(x=>x.v));
+
+  return `
+  <div class="space-y-6">
+    <div class="flex items-end justify-between gap-4 flex-wrap">
+      <div>
+        <div class="text-[11px] tracking-[0.3em] text-gold uppercase">Bóveda Central</div>
+        <h1 class="font-display text-2xl md:text-3xl mt-1 shimmer-text">AURORA — Banco Mágico</h1>
+        <p class="text-violet-200/70 font-serifm italic mt-1">"Donde el oro susurra en runas antiguas."</p>
+      </div>
+      <div class="flex gap-2">
+        <button data-route="deposits" class="btn-gold px-4 py-2.5 rounded-xl text-sm flex items-center gap-2">${icon('plus','w-4 h-4')} Depósito</button>
+        <button data-route="transfers" class="btn-magic px-4 py-2.5 rounded-xl text-sm flex items-center gap-2">${icon('wand','w-4 h-4')} Transferir</button>
+      </div>
+    </div>
+
+    <!-- KPI cards -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      ${kpi('Saldo total', fmt(s.totalBalance)+' G', 'vault', 'from-gold to-violet2')}
+      ${kpi('Estudiantes', s.students, 'users')}
+      ${kpi('Cuentas activas', s.accounts, 'key')}
+      ${kpi('Depósitos hoy', fmt(s.depositsToday)+' G', 'coin')}
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <!-- Chart -->
+      <div class="glass rune-border rounded-2xl p-5 lg:col-span-2 card-hover">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <div class="text-xs uppercase tracking-[0.24em] text-gold">Flujo arcano · últimos 7 días</div>
+            <div class="font-display text-lg mt-1">Energía financiera</div>
+          </div>
+          <div class="badge badge-violet">Live</div>
+        </div>
+        <div class="flex items-end gap-3 h-44 md:h-56">
+          ${last7.map(x => {
+            const h = Math.max(6, (x.v/maxV)*100);
+            const label = x.d.toLocaleDateString('es-CO',{weekday:'short'}).replace('.','');
+            return `<div class="flex-1 flex flex-col items-center gap-2">
+              <div class="w-full bar" style="height:${h}%"></div>
+              <div class="text-[10px] uppercase tracking-widest text-violet-300/70">${label}</div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+
+      <!-- Houses -->
+      <div class="glass rune-border rounded-2xl p-5 card-hover">
+        <div class="text-xs uppercase tracking-[0.24em] text-gold">Riqueza por casa</div>
+        <div class="font-display text-lg mt-1 mb-4">Ranking mágico</div>
+        <div class="space-y-3">
+          ${byHouse.sort((a,b)=>b.total-a.total).map(x => `
+            <div>
+              <div class="flex items-center justify-between text-sm mb-1">
+                <span class="flex items-center gap-2"><span class="text-lg">${HOUSE_ICON[x.h]}</span>${x.h}</span>
+                <span class="text-gold font-semibold">${fmt(x.total)} G</span>
+              </div>
+              <div class="h-2 rounded-full bg-white/5 overflow-hidden">
+                <div class="h-full ${HOUSE_CLASS[x.h]}" style="width:${(x.total/maxH)*100}%; box-shadow:0 0 12px rgba(201,162,76,.4);"></div>
+              </div>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent -->
+    <div class="glass rune-border rounded-2xl p-5">
+      <div class="flex items-center justify-between mb-4">
+        <div class="font-display text-lg">Actividad reciente</div>
+        <button data-route="history" class="text-xs text-gold hover:underline">Ver todo →</button>
+      </div>
+      ${recent.length ? `<div class="space-y-2">${recent.map(mvRow).join('')}</div>` : `<div class="text-center py-8 text-violet-300/60 font-serifm italic">La bóveda aún guarda silencio. Registra el primer movimiento.</div>`}
+    </div>
+  </div>`;
+}
+function kpi(label, value, ic) {
+  return `<div class="glass rune-border rounded-2xl p-4 md:p-5 card-hover relative overflow-hidden">
+    <div class="absolute -right-4 -bottom-4 w-24 h-24 rounded-full opacity-20" style="background: radial-gradient(circle, #C9A24C, transparent 60%);"></div>
+    <div class="flex items-center justify-between">
+      <div class="text-[10px] uppercase tracking-[0.22em] text-violet-200/70">${label}</div>
+      <span class="w-8 h-8 grid place-items-center rounded-lg glass text-gold">${I[ic]}</span>
+    </div>
+    <div class="mt-3 font-display text-xl md:text-2xl shimmer-text">${value}</div>
+  </div>`;
+}
+function mvRow(m) {
+  const s = state.students.find(x=>x.id===m.studentId);
+  const sign = ['deposit','transfer_in'].includes(m.kind) ? '+' : '-';
+  const color = sign === '+' ? 'text-emerald-300' : 'text-rose-300';
+  const kindLabel = { deposit:'Depósito', withdraw:'Retiro', purchase:'Compra', transfer_out:'Transferencia enviada', transfer_in:'Transferencia recibida' }[m.kind] || m.kind;
+  return `<div class="flex items-center gap-3 p-3 rounded-xl bg-white/[.03] hover:bg-white/[.06] transition">
+    <div class="w-10 h-10 rounded-full ${s? HOUSE_CLASS[s.house]:''} grid place-items-center text-lg shrink-0">${s?.avatar||'✦'}</div>
+    <div class="min-w-0 flex-1">
+      <div class="text-sm font-medium truncate">${s?.name||'—'} <span class="text-violet-300/60 text-xs">· ${kindLabel}</span></div>
+      <div class="text-[11px] text-violet-300/60 truncate">${m.description||''} · ${fmtDate(m.ts)}</div>
+    </div>
+    <div class="text-right shrink-0">
+      <div class="${color} font-semibold text-sm">${sign}${fmt(m.amount)} G</div>
+    </div>
+  </div>`;
+}
+function wireDashboard() {
+  $$('[data-route]').forEach(b => b.addEventListener('click', () => { route = b.dataset.route; render(); }));
+}
+
+// ---------- STUDENTS ----------
+let studentsFilter = { q:'', house:'', status:'' };
+function viewStudents() {
+  const list = state.students.filter(s => {
+    const q = studentsFilter.q.toLowerCase();
+    return (!q || s.name.toLowerCase().includes(q) || s.id.toLowerCase().includes(q))
+      && (!studentsFilter.house || s.house === studentsFilter.house)
+      && (!studentsFilter.status || s.status === studentsFilter.status);
+  });
+  return `
+  <div class="space-y-6">
+    <div class="flex items-end justify-between gap-4 flex-wrap">
+      <div>
+        <div class="text-[11px] tracking-[0.3em] text-gold uppercase">Registro Arcano</div>
+        <h1 class="font-display text-2xl md:text-3xl mt-1 shimmer-text">Estudiantes</h1>
+      </div>
+      <button id="newStudentBtn" class="btn-magic px-4 py-2.5 rounded-xl text-sm flex items-center gap-2">${icon('plus','w-4 h-4')} Nuevo estudiante</button>
+    </div>
+
+    <div class="glass rune-border rounded-2xl p-4 grid grid-cols-1 md:grid-cols-4 gap-3">
+      <div class="md:col-span-2">
+        <label class="label">Buscar</label>
+        <input id="fq" class="input mt-1" placeholder="Nombre o ID mágico" value="${studentsFilter.q}">
+      </div>
+      <div>
+        <label class="label">Casa</label>
+        <select id="fh" class="input mt-1">
+          <option value="">Todas</option>
+          ${HOUSES.map(h=>`<option ${studentsFilter.house===h?'selected':''}>${h}</option>`).join('')}
+        </select>
+      </div>
+      <div>
+        <label class="label">Estado</label>
+        <select id="fs" class="input mt-1">
+          <option value="">Todos</option>
+          <option ${studentsFilter.status==='Activo'?'selected':''}>Activo</option>
+          <option ${studentsFilter.status==='Inactivo'?'selected':''}>Inactivo</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      ${list.map(s => `
+        <button data-open="${s.id}" class="glass rune-border rounded-2xl p-4 text-left card-hover">
+          <div class="flex items-center gap-3">
+            <div class="w-14 h-14 rounded-2xl ${HOUSE_CLASS[s.house]} grid place-items-center text-2xl shadow-glow overflow-hidden">${s.photo?`<img src="${s.photo}" class="w-full h-full object-cover"/>`:s.avatar}</div>
+            <div class="min-w-0 flex-1">
+              <div class="font-semibold truncate">${s.name}</div>
+              <div class="text-[11px] uppercase tracking-widest text-gold">${s.id}</div>
+            </div>
+            <span class="badge ${s.status==='Activo'?'badge-emerald':'badge-rose'}">${s.status}</span>
+          </div>
+          <div class="mt-3 flex items-center justify-between">
+            <div class="flex items-center gap-2"><span>${HOUSE_ICON[s.house]}</span><span class="text-sm text-violet-200/80">${s.house}</span></div>
+            <div class="font-display text-lg shimmer-text">${fmt(s.balance)} G</div>
+          </div>
+        </button>`).join('')}
+      ${list.length ? '' : `<div class="col-span-full text-center py-10 text-violet-300/60 font-serifm italic">Ningún hechicero encontrado.</div>`}
+    </div>
+  </div>
+  ${modalHost()}`;
+}
+function wireStudents() {
+  $('#fq').addEventListener('input', e => { studentsFilter.q = e.target.value; render(); });
+  $('#fh').addEventListener('change', e => { studentsFilter.house = e.target.value; render(); });
+  $('#fs').addEventListener('change', e => { studentsFilter.status = e.target.value; render(); });
+  $$('[data-open]').forEach(b => b.addEventListener('click', () => { selectedStudentId = b.dataset.open; route='student'; render(); }));
+  $('#newStudentBtn').addEventListener('click', ()=> openStudentModal(null));
+}
+function openStudentModal(id) {
+  const s = id ? state.students.find(x=>x.id===id) : null;
+  showModal(`
+    <form id="studentForm" class="space-y-4">
+      <div class="text-[11px] tracking-[0.28em] text-gold uppercase">${s?'Editar':'Nuevo'} estudiante</div>
+      <h3 class="font-display text-xl shimmer-text">${s?s.name:'Registrar hechicero'}</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div><label class="label">Nombre</label><input class="input mt-1" name="name" value="${s?.name||''}" required></div>
+        <div><label class="label">Casa</label><select class="input mt-1" name="house">${HOUSES.map(h=>`<option ${s?.house===h?'selected':''}>${h}</option>`).join('')}</select></div>
+        <div><label class="label">Estado</label><select class="input mt-1" name="status"><option ${s?.status==='Activo'?'selected':''}>Activo</option><option ${s?.status==='Inactivo'?'selected':''}>Inactivo</option></select></div>
+        <div><label class="label">Saldo inicial (G)</label><input class="input mt-1" name="balance" type="number" min="0" value="${s?.balance||''}" placeholder=""></div>
+        <div>
+          <label class="label">Foto (opcional)</label>
+          <input class="input mt-1" name="photoFile" type="file" accept="image/*" capture="environment">
+        </div>
+        <div class="md:col-span-2"><label class="label">Descripción / Observaciones</label><textarea class="input mt-1" name="notes" rows="2" placeholder="Cuenta algo sobre ti…">${s?.notes||''}</textarea></div>
+      </div>
+      <div class="flex items-center justify-between gap-2 pt-2">
+        <div>${s?`<button type="button" id="delBtn" class="text-rose-300 text-sm hover:text-rose-200">Eliminar</button>`:''}</div>
+        <div class="flex gap-2">
+          <button type="button" class="btn-ghost px-4 py-2 rounded-xl text-sm" onclick="closeModal()">Cancelar</button>
+          <button class="btn-gold px-4 py-2 rounded-xl text-sm">${s?'Guardar':'Crear cuenta mágica'}</button>
+        </div>
+      </div>
+    </form>
+  `);
+  $('#studentForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const form = e.target;
+    const fileInput = form.querySelector('[name=photoFile]');
+    const file = fileInput?.files?.[0];
+    let photoData = s?.photo || '';
+    if (file) {
+      photoData = await new Promise((res)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.readAsDataURL(file); });
+    }
+    const fd = Object.fromEntries(new FormData(form).entries());
+    delete fd.photoFile;
+    fd.balance = Math.max(0, parseFloat(fd.balance)||0);
+    if (!fd.avatar) fd.avatar = '✦';
+    fd.photo = photoData;
+    if (s) { Object.assign(s, fd); toast('Estudiante actualizado.','ok'); saveState(state); closeModal(); render(); }
+    else {
+      const nid = nextStudentId();
+      const newStudent = { id:nid, ...fd, enrolled:Date.now(), history:[] };
+      state.students.push(newStudent);
+      // Auto-crear cuenta de usuario para el estudiante
+      const username = generateUsername(fd.name);
+      const password = generatePassword();
+      const newUser = { id:uid('u'), name:fd.name, username, password, role:'estudiante', studentId:nid, createdAt:Date.now() };
+      state.users.push(newUser);
+      notify('Nueva cuenta creada', `${fd.name} · ${nid}`, 'gold');
+      saveState(state);
+      closeModal();
+      showCredentialsModal(newStudent, newUser);
+    }
+  });
+  $('#delBtn')?.addEventListener('click', ()=>{
+    if (!confirm('¿Eliminar estudiante y su cuenta? Esta acción no se puede deshacer.')) return;
+    state.students = state.students.filter(x=>x.id!==s.id);
+    state.movements = state.movements.filter(m=>m.studentId!==s.id);
+    state.users = state.users.filter(u=>u.studentId!==s.id);
+    saveState(state); closeModal(); toast('Estudiante eliminado.','err'); render();
+  });
+}
+
+function generateUsername(name){
+  const base = (name||'mago').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'').slice(0,10) || 'mago';
+  const suffix = Math.floor(100+Math.random()*900);
+  return `${base}${suffix}`;
+}
+function generatePassword(){
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let p = ''; for (let i=0;i<6;i++) p += chars[Math.floor(Math.random()*chars.length)];
+  return p;
+}
+function copyText(t){
+  if (navigator.clipboard) return navigator.clipboard.writeText(t);
+  const ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+  return Promise.resolve();
+}
+function showCredentialsModal(student, user){
+  const house = student.house;
+  const msg = `✨🪄 *AURORA · Banco Mágico* 🪄✨\n\n🌟 ¡Bienvenido(a) *${student.name}*! 🌟\n\n🏰 Casa: *${HOUSE_ICON[house]} ${house}*\n🆔 ID mágico: *${student.id}*\n\n🔮 *Tus credenciales secretas:* 🔮\n👤 Usuario: *${user.username}*\n🔑 Clave: *${user.password}*\n\n🌙 Ingresa a la bóveda mágica y descubre tu oro.\n✦ Guarda esta información con recelo, hechicero(a). ✦\n\n— El Consejo de AURORA 🦉`;
+  showModal(`
+    <div class="space-y-4">
+      <div class="text-[11px] tracking-[0.28em] text-gold uppercase">Cuenta creada</div>
+      <h3 class="font-display text-xl shimmer-text">Credenciales de ${student.name}</h3>
+      <div class="glass rounded-xl p-4 space-y-3">
+        <div class="flex items-center justify-between gap-3">
+          <div><div class="label">Usuario</div><div class="font-mono text-lg text-gold">${user.username}</div></div>
+          <button type="button" class="btn-ghost px-3 py-2 rounded-lg text-xs" data-copy="${user.username}">Copiar usuario</button>
+        </div>
+        <div class="flex items-center justify-between gap-3">
+          <div><div class="label">Contraseña</div><div class="font-mono text-lg text-gold">${user.password}</div></div>
+          <button type="button" class="btn-ghost px-3 py-2 rounded-lg text-xs" data-copy="${user.password}">Copiar clave</button>
+        </div>
+      </div>
+      <div class="glass rounded-xl p-4">
+        <div class="label mb-2">Mensaje de credenciales (para copiar)</div>
+        <pre class="text-xs whitespace-pre-wrap text-violet-100/90 font-serifm">${msg}</pre>
+      </div>
+      <div class="flex flex-wrap gap-2 justify-end pt-2">
+        <button type="button" id="copyMsgBtn" class="btn-gold px-4 py-2 rounded-xl text-sm">📋 Copiar mensaje</button>
+        <button type="button" class="btn-magic px-4 py-2 rounded-xl text-sm" onclick="closeModal(); route='students'; render();">Listo</button>
+      </div>
+    </div>
+  `);
+  $$('[data-copy]').forEach(b=>b.addEventListener('click', ()=>{ copyText(b.dataset.copy); b.textContent = '✓ Copiado'; setTimeout(()=>{ b.textContent = b.dataset.copy===user.username?'Copiar usuario':'Copiar clave'; }, 1500); }));
+  $('#copyMsgBtn').addEventListener('click', ()=>{ copyText(msg); const btn=$('#copyMsgBtn'); btn.textContent='✓ Copiado'; setTimeout(()=>btn.textContent='📋 Copiar mensaje',1500); });
+}
+
+// ---------- STUDENT DETAIL ----------
+function viewStudentDetail() {
+  const s = state.students.find(x=>x.id===selectedStudentId);
+  if (!s) { route='students'; return viewStudents(); }
+  const movs = state.movements.filter(m=>m.studentId===s.id).sort((a,b)=>b.ts-a.ts);
+  const last30 = Array.from({length:12}).map((_,i)=>{
+    const start = Date.now() - (11-i)*3*86400000;
+    const end = start + 3*86400000;
+    return movs.filter(m=>m.ts>=start&&m.ts<end).reduce((a,m)=>a + (['deposit','transfer_in'].includes(m.kind)?m.amount:-m.amount), 0);
+  });
+  const maxV = Math.max(1, ...last30.map(Math.abs));
+
+  return `
+  <div class="space-y-6">
+    <button data-route="students" class="text-xs text-gold hover:underline">← Volver a estudiantes</button>
+
+    <div class="glass rune-border rounded-3xl p-6 md:p-8 relative overflow-hidden">
+      <div class="absolute -top-20 -right-16 w-64 h-64 rounded-full opacity-30" style="background: radial-gradient(circle, rgba(167,139,250,.7), transparent 60%);"></div>
+      <div class="flex flex-col md:flex-row md:items-center gap-6 relative">
+        <div class="w-24 h-24 rounded-3xl ${HOUSE_CLASS[s.house]} grid place-items-center text-4xl shadow-glow floaty overflow-hidden">${s.photo?`<img src="${s.photo}" class="w-full h-full object-cover"/>`:s.avatar}</div>
+        <div class="flex-1 min-w-0">
+          <div class="text-[11px] uppercase tracking-[0.28em] text-gold">${s.id}</div>
+          <h1 class="font-display text-2xl md:text-3xl mt-1">${s.name}</h1>
+          <div class="mt-2 flex flex-wrap gap-2">
+            <span class="badge badge-violet">${HOUSE_ICON[s.house]} ${s.house}</span>
+            <span class="badge ${s.status==='Activo'?'badge-emerald':'badge-rose'}">${s.status}</span>
+          </div>
+          ${s.notes?`<p class="mt-3 text-sm text-violet-200/80 font-serifm italic">"${s.notes}"</p>`:''}
+        </div>
+        <div class="text-right">
+          <div class="text-[11px] uppercase tracking-widest text-violet-200/70">Saldo actual</div>
+          <div class="font-display text-3xl md:text-4xl shimmer-text mt-1">${fmt(s.balance)} G</div>
+          <div class="mt-3 flex gap-2 justify-end">
+            <button id="editStu" class="btn-ghost px-3 py-2 rounded-lg text-xs">Editar</button>
+            <button id="depStu" class="btn-gold px-3 py-2 rounded-lg text-xs">+ Depósito</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div class="glass rune-border rounded-2xl p-5 lg:col-span-2">
+        <div class="text-xs uppercase tracking-[0.24em] text-gold">Actividad financiera</div>
+        <div class="font-display text-lg mt-1 mb-4">Flujo del estudiante</div>
+        <div class="flex items-end gap-2 h-40">
+          ${last30.map(v => {
+            const h = Math.max(4, Math.abs(v)/maxV*100);
+            const color = v>=0 ? 'linear-gradient(180deg,#F1D08A,#C9A24C)' : 'linear-gradient(180deg,#f472b6,#9333ea)';
+            return `<div class="flex-1 rounded-md" style="height:${h}%; background:${color}; box-shadow:0 0 10px rgba(167,139,250,.4);"></div>`;
+          }).join('')}
+        </div>
+        <div class="text-[10px] text-violet-300/60 mt-2 text-center uppercase tracking-widest">Últimas 12 ventanas de 3 días</div>
+      </div>
+
+      <div class="glass rune-border rounded-2xl p-5">
+        <div class="text-xs uppercase tracking-[0.24em] text-gold">Resumen</div>
+        <div class="font-display text-lg mt-1 mb-4">Estadísticas</div>
+        <div class="space-y-2 text-sm">
+          ${statRow('Depósitos totales', movs.filter(m=>m.kind==='deposit').reduce((a,m)=>a+m.amount,0))}
+          ${statRow('Retiros totales', movs.filter(m=>m.kind==='withdraw').reduce((a,m)=>a+m.amount,0))}
+          ${statRow('Compras totales', movs.filter(m=>m.kind==='purchase').reduce((a,m)=>a+m.amount,0))}
+          ${statRow('Transferencias enviadas', movs.filter(m=>m.kind==='transfer_out').reduce((a,m)=>a+m.amount,0))}
+          ${statRow('Transferencias recibidas', movs.filter(m=>m.kind==='transfer_in').reduce((a,m)=>a+m.amount,0))}
+        </div>
+      </div>
+    </div>
+
+    <div class="glass rune-border rounded-2xl p-5">
+      <div class="font-display text-lg mb-3">Historial de movimientos</div>
+      ${movs.length ? `<div class="space-y-2">${movs.map(mvRow).join('')}</div>` : `<div class="text-center py-8 text-violet-300/60 font-serifm italic">Sin movimientos aún.</div>`}
+    </div>
+  </div>
+  ${modalHost()}`;
+}
+function statRow(l,v){ return `<div class="flex items-center justify-between p-2 rounded-lg bg-white/[.03]"><span class="text-violet-200/80">${l}</span><span class="text-gold font-semibold">${fmt(v)} G</span></div>`; }
+function wireStudentDetail() {
+  $$('[data-route]').forEach(b => b.addEventListener('click', () => { route=b.dataset.route; render(); }));
+  $('#editStu').addEventListener('click', ()=> openStudentModal(selectedStudentId));
+  $('#depStu').addEventListener('click', ()=> { route='deposits'; render(); setTimeout(()=>{ const sel=$('#opStudent'); if(sel){ sel.value=selectedStudentId; }},50); });
+}
+
+// ---------- OPERATIONS (deposit / withdraw / purchase) ----------
+function opMeta(kind){
+  return {
+    deposit:   { title:'Depósito', tag:'Ingreso a bóveda', color:'gold', ic:'coin' },
+    withdraw:  { title:'Retiro', tag:'Salida de bóveda', color:'violet', ic:'arrow' },
+    purchase:  { title:'Compra', tag:'Adquisición mágica', color:'violet', ic:'scroll' },
+  }[kind];
+}
+function viewOperation(kind) {
+  const m = opMeta(kind);
+  return `
+  <div class="space-y-6 max-w-3xl">
+    <div>
+      <div class="text-[11px] tracking-[0.3em] text-gold uppercase">${m.tag}</div>
+      <h1 class="font-display text-2xl md:text-3xl mt-1 shimmer-text">${m.title}</h1>
+    </div>
+    <form id="opForm" class="glass rune-border rounded-2xl p-5 space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div><label class="label">Estudiante</label>
+          <select id="opStudent" class="input mt-1" name="studentId" required>
+            <option value="">Seleccionar…</option>
+            ${state.students.map(s=>`<option value="${s.id}">${s.id} · ${s.name} (${fmt(s.balance)} G)</option>`).join('')}
+          </select>
+        </div>
+        <div><label class="label">Valor (G)</label><input class="input mt-1" name="amount" type="number" min="1" placeholder="Ingresa el monto" required></div>
+        <div><label class="label">Responsable</label><input class="input mt-1" name="responsible" value="${currentUser().name}" required></div>
+        <div class="md:col-span-2"><label class="label">Descripción</label><input class="input mt-1" name="description" placeholder="Motivo del movimiento"></div>
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button type="button" class="btn-ghost px-4 py-2 rounded-xl text-sm" onclick="route='dashboard';render()">Cancelar</button>
+        <button class="${kind==='deposit'?'btn-gold':'btn-magic'} px-5 py-2.5 rounded-xl text-sm">Registrar ${m.title.toLowerCase()}</button>
+      </div>
+    </form>
+  </div>`;
+}
+function currentUser(){ return state.users.find(u=>u.id===state.session.userId); }
+function wireOperation(kind) {
+  $('#opForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const fd = Object.fromEntries(new FormData(e.target).entries());
+    const amount = Math.max(0, parseFloat(fd.amount)||0);
+    if (!fd.studentId || !amount) return toast('Datos inválidos.','err');
+    const s = state.students.find(x=>x.id===fd.studentId);
+    if (kind !== 'deposit' && s.balance < amount) return toast('Saldo insuficiente. La bóveda rechaza el conjuro.','err');
+    if (kind === 'deposit') s.balance += amount; else s.balance -= amount;
+    state.movements.push({ id:uid('m'), studentId:s.id, kind, amount, description:fd.description||'', category:fd.category||'', responsible:fd.responsible||'', ts:Date.now() });
+    notify(opMeta(kind).title+' registrado', `${s.name} · ${fmt(amount)} G`, kind==='deposit'?'gold':'info');
+    saveState(state); toast(`${opMeta(kind).title} de ${fmt(amount)} G registrado.`, kind==='deposit'?'gold':'ok'); render();
+  });
+}
+
+// ---------- TRANSFERS ----------
+function viewTransfer() {
+  return `
+  <div class="space-y-6 max-w-3xl">
+    <div>
+      <div class="text-[11px] tracking-[0.3em] text-gold uppercase">Encantamiento de traslado</div>
+      <h1 class="font-display text-2xl md:text-3xl mt-1 shimmer-text">Transferencia</h1>
+    </div>
+    <form id="trForm" class="glass rune-border rounded-2xl p-5 space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div><label class="label">Origen</label>
+          <select class="input mt-1" name="from" required>
+            <option value="">Seleccionar…</option>
+            ${state.students.map(s=>`<option value="${s.id}">${s.id} · ${s.name} (${fmt(s.balance)} G)</option>`).join('')}
+          </select>
+        </div>
+        <div><label class="label">Destino</label>
+          <select class="input mt-1" name="to" required>
+            <option value="">Seleccionar…</option>
+            ${state.students.map(s=>`<option value="${s.id}">${s.id} · ${s.name}</option>`).join('')}
+          </select>
+        </div>
+        <div><label class="label">Valor (G)</label><input class="input mt-1" name="amount" type="number" min="1" placeholder="Ingresa el monto" required></div>
+        <div><label class="label">Responsable</label><input class="input mt-1" name="responsible" value="${currentUser().name}" required></div>
+        <div class="md:col-span-2"><label class="label">Motivo</label><input class="input mt-1" name="description" placeholder="Descripción del traslado"></div>
+      </div>
+      <div class="flex justify-end gap-2">
+        <button type="button" class="btn-ghost px-4 py-2 rounded-xl text-sm" onclick="route='dashboard';render()">Cancelar</button>
+        <button class="btn-magic px-5 py-2.5 rounded-xl text-sm">${icon('wand','w-4 h-4')} Conjurar transferencia</button>
+      </div>
+    </form>
+  </div>`;
+}
+function wireTransfer() {
+  $('#trForm').addEventListener('submit', e=>{
+    e.preventDefault();
+    const fd = Object.fromEntries(new FormData(e.target).entries());
+    const amount = Math.max(0, parseFloat(fd.amount)||0);
+    if (fd.from === fd.to) return toast('Origen y destino no pueden ser iguales.','err');
+    const from = state.students.find(x=>x.id===fd.from);
+    const to = state.students.find(x=>x.id===fd.to);
+    if (!from || !to || !amount) return toast('Datos inválidos.','err');
+    if (from.balance < amount) return toast('Saldo insuficiente en la cuenta origen.','err');
+    from.balance -= amount; to.balance += amount;
+    const ts = Date.now();
+    state.movements.push({ id:uid('m'), studentId:from.id, kind:'transfer_out', amount, description:`→ ${to.name}: ${fd.description||''}`, responsible:fd.responsible, ts });
+    state.movements.push({ id:uid('m'), studentId:to.id, kind:'transfer_in', amount, description:`← ${from.name}: ${fd.description||''}`, responsible:fd.responsible, ts });
+    notify('Transferencia mágica', `${from.name} → ${to.name} · ${fmt(amount)} G`, 'info');
+    saveState(state); toast('Transferencia realizada con éxito.','ok'); render();
+  });
+}
+
+// ---------- HISTORY ----------
+let histQ = '';
+function viewHistory() {
+  const movs = [...state.movements].sort((a,b)=>b.ts-a.ts).filter(m=>{
+    if (!histQ) return true;
+    const s = state.students.find(x=>x.id===m.studentId);
+    const q = histQ.toLowerCase();
+    return (s?.name||'').toLowerCase().includes(q) || (s?.id||'').toLowerCase().includes(q) || (m.description||'').toLowerCase().includes(q) || (m.kind||'').includes(q);
+  });
+  return `
+  <div class="space-y-6">
+    <div class="flex items-end justify-between gap-4 flex-wrap">
+      <div>
+        <div class="text-[11px] tracking-[0.3em] text-gold uppercase">Grimorio de movimientos</div>
+        <h1 class="font-display text-2xl md:text-3xl mt-1 shimmer-text">Historial completo</h1>
+      </div>
+    </div>
+    <div class="glass rune-border rounded-2xl p-4">
+      <div class="flex items-center gap-2 glass rounded-xl px-3 py-2">
+        <span class="text-gold w-4 h-4">${I.search}</span>
+        <input id="historySearch" class="bg-transparent outline-none w-full text-sm placeholder:text-violet-300/50" placeholder="Buscar por nombre, ID, descripción..." value="${histQ}">
+      </div>
+    </div>
+    <div class="glass rune-border rounded-2xl p-3">
+      ${movs.length ? `<div class="space-y-2">${movs.map(mvRow).join('')}</div>` : `<div class="text-center py-10 text-violet-300/60 font-serifm italic">Sin movimientos registrados.</div>`}
+    </div>
+  </div>`;
+}
+function wireHistory() {
+  $('#historySearch').addEventListener('input', e => { histQ = e.target.value; const m=$('#main'); m.innerHTML = viewHistory(); wireHistory(); $('#historySearch').focus(); const v=$('#historySearch').value; $('#historySearch').setSelectionRange(v.length,v.length); });
+}
+
+// ---------- DEPOSIT REQUESTS (student-submitted, admin/duende verified) ----------
+function reqStatusBadge(st){
+  if (st==='pending')  return `<span class="badge badge-violet">⏳ Pendiente</span>`;
+  if (st==='approved') return `<span class="badge badge-emerald">✓ Verificado</span>`;
+  if (st==='rejected') return `<span class="badge badge-rose">✕ Rechazado</span>`;
+  return `<span class="badge">${st}</span>`;
+}
+function viewRequests() {
+  const pending = state.depositRequests.filter(r=>r.status==='pending').sort((a,b)=>b.ts-a.ts);
+  const reviewed = state.depositRequests.filter(r=>r.status!=='pending').sort((a,b)=>(b.reviewedAt||0)-(a.reviewedAt||0)).slice(0,30);
+  const reqRow = (r, actions) => {
+    const s = state.students.find(x=>x.id===r.studentId);
+    return `
+      <div class="glass rune-border rounded-2xl p-4 flex flex-col md:flex-row md:items-center gap-3">
+        <div class="w-12 h-12 rounded-2xl ${s?HOUSE_CLASS[s.house]:''} grid place-items-center text-xl shadow-glow shrink-0">${s?.avatar||'✦'}</div>
+        <div class="flex-1 min-w-0">
+          <div class="text-sm font-semibold truncate">${s?.name||'—'} <span class="text-violet-300/60 text-xs">· ${r.studentId}</span></div>
+          <div class="text-[11px] text-violet-300/60">${r.description||'Sin descripción'} · ${fmtDate(r.ts)}</div>
+          ${r.reviewNote?`<div class="text-[11px] text-violet-200/70 italic mt-1">Nota: ${r.reviewNote}</div>`:''}
+        </div>
+        <div class="text-right">
+          <div class="font-display text-lg shimmer-text">+${fmt(r.amount)} G</div>
+          <div class="mt-1">${reqStatusBadge(r.status)}</div>
+        </div>
+        ${actions?`<div class="flex gap-2 md:ml-3">
+          <button data-approve="${r.id}" class="btn-gold px-3 py-2 rounded-lg text-xs">Verificar</button>
+          <button data-reject="${r.id}" class="btn-ghost px-3 py-2 rounded-lg text-xs text-rose-200">Rechazar</button>
+        </div>`:''}
+      </div>`;
+  };
+  return `
+  <div class="space-y-6">
+    <div>
+      <div class="text-[11px] tracking-[0.3em] text-gold uppercase">Cámara de Verificación</div>
+      <h1 class="font-display text-2xl md:text-3xl mt-1 shimmer-text">Solicitudes de depósito</h1>
+      <p class="text-violet-200/70 font-serifm italic mt-1">"Cuando los duendes duermen, los estudiantes registran; al despertar, el archimago verifica."</p>
+    </div>
+
+    <div class="glass rune-border rounded-2xl p-5">
+      <div class="flex items-center justify-between mb-4">
+        <div class="font-display text-lg">Pendientes de verificación</div>
+        <span class="badge badge-gold">${pending.length}</span>
+      </div>
+      ${pending.length ? `<div class="space-y-2">${pending.map(r=>reqRow(r,true)).join('')}</div>`
+        : `<div class="text-center py-8 text-violet-300/60 font-serifm italic">No hay solicitudes pendientes. La bóveda descansa.</div>`}
+    </div>
+
+    <div class="glass rune-border rounded-2xl p-5">
+      <div class="font-display text-lg mb-3">Historial de solicitudes</div>
+      ${reviewed.length ? `<div class="space-y-2">${reviewed.map(r=>reqRow(r,false)).join('')}</div>`
+        : `<div class="text-center py-8 text-violet-300/60 font-serifm italic">Aún no se han revisado solicitudes.</div>`}
+    </div>
+  </div>`;
+}
+function wireRequests() {
+  $$('[data-approve]').forEach(b=>b.addEventListener('click',()=>{
+    const r = state.depositRequests.find(x=>x.id===b.dataset.approve); if (!r || r.status!=='pending') return;
+    const s = state.students.find(x=>x.id===r.studentId); if (!s) return toast('Estudiante no existe.','err');
+    s.balance += r.amount;
+    state.movements.push({ id:uid('m'), studentId:s.id, kind:'deposit', amount:r.amount, description:(r.description||'Depósito solicitado')+' · verificado', responsible:currentUser().name, ts:Date.now() });
+    r.status='approved'; r.reviewedBy=currentUser().name; r.reviewedAt=Date.now();
+    notify('Depósito verificado', `${s.name} +${fmt(r.amount)} G`, 'gold');
+    saveState(state); toast('Depósito verificado y acreditado.','gold'); render();
+  }));
+  $$('[data-reject]').forEach(b=>b.addEventListener('click',()=>{
+    const r = state.depositRequests.find(x=>x.id===b.dataset.reject); if (!r || r.status!=='pending') return;
+    const note = prompt('Motivo del rechazo (opcional):','')||'';
+    r.status='rejected'; r.reviewedBy=currentUser().name; r.reviewedAt=Date.now(); r.reviewNote=note;
+    const s = state.students.find(x=>x.id===r.studentId);
+    notify('Solicitud rechazada', `${s?.name||r.studentId} · ${fmt(r.amount)} G`, 'info');
+    saveState(state); toast('Solicitud rechazada.','err'); render();
+  }));
+}
+
+
+// ---------- NOTIFICATIONS ----------
+function viewNotifications() {
+  state.notifications.forEach(n => n.read = true);
+  saveState(state);
+  return `
+  <div class="space-y-6 max-w-3xl">
+    <div>
+      <div class="text-[11px] tracking-[0.3em] text-gold uppercase">Torre de Alertas</div>
+      <h1 class="font-display text-2xl md:text-3xl mt-1 shimmer-text">Notificaciones</h1>
+    </div>
+    <div class="space-y-3">
+      ${state.notifications.length ? state.notifications.map(n=>`
+        <div class="glass rune-border rounded-2xl p-4 flex items-start gap-3">
+          <div class="w-10 h-10 rounded-full grid place-items-center ${n.type==='gold'?'bg-gold/20 text-gold':'bg-violet-500/20 text-amethyst'} text-lg">${n.type==='gold'?'✦':'ᛗ'}</div>
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-semibold">${n.title}</div>
+            <div class="text-xs text-violet-200/80">${n.msg}</div>
+            <div class="text-[10px] text-violet-300/50 mt-1 uppercase tracking-widest">${fmtDate(n.ts)}</div>
+          </div>
+        </div>`).join('') : `<div class="text-center py-10 text-violet-300/60 font-serifm italic">El pergamino está en silencio.</div>`}
+    </div>
+  </div>`;
+}
+
+// ---------- ADMIN ----------
+function viewAdmin() {
+  const user = currentUser();
+  if (user.role !== 'admin') return `<div class="glass rune-border rounded-2xl p-6 text-center">Acceso restringido al Archimago.</div>`;
+  return `
+  <div class="space-y-6">
+    <div class="flex items-end justify-between flex-wrap gap-4">
+      <div>
+        <div class="text-[11px] tracking-[0.3em] text-gold uppercase">Cámara del Consejo</div>
+        <h1 class="font-display text-2xl md:text-3xl mt-1 shimmer-text">Administración</h1>
+      </div>
+      <button id="newUserBtn" class="btn-magic px-4 py-2.5 rounded-xl text-sm flex items-center gap-2">${icon('plus','w-4 h-4')} Nueva cuenta</button>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="glass rune-border rounded-2xl p-5">
+        <div class="flex items-center justify-between mb-4">
+          <div class="font-display text-lg">Cuentas del sistema</div>
+          <span class="badge badge-violet">${state.users.length}</span>
+        </div>
+        <p class="text-[11px] text-violet-300/60 font-serifm italic mb-3">Todas las cuentas del banco. Toca cualquiera para cambiar su rol o ver credenciales.</p>
+        <div class="space-y-2">
+          ${state.users.map(u=>{
+            const linked = u.studentId ? state.students.find(x=>x.id===u.studentId) : null;
+            const houseCls = linked ? HOUSE_CLASS[linked.house] : (u.role==='admin'?'bg-gradient-to-br from-yellow-500 to-amber-700 text-black':u.role==='duende'?'bg-gradient-to-br from-violet-600 to-indigo-900':'house-lunaris');
+            return `
+            <div class="flex items-center gap-3 p-3 rounded-xl bg-white/[.03]">
+              <div class="w-10 h-10 rounded-full grid place-items-center ${houseCls} text-lg overflow-hidden">${linked?.photo?`<img src="${linked.photo}" class="w-full h-full object-cover"/>`:(u.role==='admin'?'✦':u.role==='duende'?'ᚱ':(linked?.avatar||'★'))}</div>
+              <div class="flex-1 min-w-0">
+                <div class="text-sm font-semibold truncate">${u.name} <span class="text-violet-300/60 text-xs">· @${u.username}</span></div>
+                <div class="text-[10px] uppercase tracking-widest text-gold">${u.role}${linked?` · ${linked.id}`:''}</div>
+              </div>
+              ${u.id!=='u-admin'?`
+                <select data-role="${u.id}" class="input !py-1 !px-2 !w-auto text-xs">
+                  <option value="admin" ${u.role==='admin'?'selected':''}>Archimago</option>
+                  <option value="duende" ${u.role==='duende'?'selected':''}>Duende</option>
+                  <option value="estudiante" ${u.role==='estudiante'?'selected':''}>Estudiante</option>
+                </select>
+                <button data-showcred="${u.id}" class="btn-ghost px-2 py-1 rounded-lg text-xs">🔑</button>
+                <button data-deluser="${u.id}" class="text-rose-300 text-xs hover:text-rose-200">✕</button>`:''}
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+
+      <div class="glass rune-border rounded-2xl p-5 space-y-4">
+        <div class="font-display text-lg">Configuración y respaldo</div>
+        <div class="grid grid-cols-2 gap-2">
+          <button id="exportBtn" class="btn-ghost px-3 py-2 rounded-lg text-sm">Exportar datos (JSON)</button>
+          <label class="btn-ghost px-3 py-2 rounded-lg text-sm cursor-pointer text-center">Importar JSON<input id="importFile" type="file" accept="application/json" class="hidden"></label>
+          <button id="seedBtn" class="btn-ghost px-3 py-2 rounded-lg text-sm">Sembrar datos demo</button>
+          <button id="resetBtn" class="btn-ghost px-3 py-2 rounded-lg text-sm text-rose-200">Restablecer bóveda (demo)</button>
+        </div>
+        <div class="text-[11px] text-violet-300/60 font-serifm italic">"El respaldo es el mejor conjuro contra el olvido."</div>
+
+        <div class="mt-3 p-4 rounded-xl border border-rose-500/40 bg-rose-500/5 space-y-2">
+          <div class="flex items-center gap-2">
+            <span class="text-rose-300 text-lg">⚠</span>
+            <div class="font-display text-base text-rose-100">Zona arcana peligrosa</div>
+          </div>
+          <div class="text-[12px] text-rose-100/80">Reinicia TODO el banco: borra estudiantes, movimientos, solicitudes, notificaciones y cuentas de duendes/estudiantes. Solo se conservará el Archimago fundador.</div>
+          <button id="nukeBtn" class="w-full mt-2 px-4 py-2.5 rounded-xl text-sm font-display tracking-widest uppercase bg-gradient-to-r from-rose-700 via-rose-600 to-rose-800 text-white shadow-glow hover:brightness-110">🔥 Reiniciar TODO el sistema</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  ${modalHost()}`;
+}
+function wireAdmin() {
+  $('#newUserBtn').addEventListener('click', openUserModal);
+  $$('[data-deluser]').forEach(b=>b.addEventListener('click', ()=>{
+    if (!confirm('¿Eliminar cuenta?')) return;
+    state.users = state.users.filter(u=>u.id!==b.dataset.deluser);
+    saveState(state); render(); toast('Cuenta eliminada.','err');
+  }));
+  $$('[data-role]').forEach(sel=>sel.addEventListener('change', ()=>{
+    const u = state.users.find(x=>x.id===sel.dataset.role); if (!u) return;
+    u.role = sel.value; saveState(state); toast(`Rol de ${u.name} → ${u.role}`,'gold'); render();
+  }));
+  $$('[data-showcred]').forEach(b=>b.addEventListener('click', ()=>{
+    const u = state.users.find(x=>x.id===b.dataset.showcred); if (!u) return;
+    const linked = u.studentId ? state.students.find(x=>x.id===u.studentId) : { name:u.name, house:'Lunaris', id:'—' };
+    showCredentialsModal(linked, u);
+  }));
+  $('#exportBtn').addEventListener('click', ()=>{
+    const blob = new Blob([JSON.stringify(state,null,2)], { type:'application/json' });
+    const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='aurora-backup.json'; a.click();
+    toast('Respaldo generado.','gold');
+  });
+  $('#importFile').addEventListener('change', e=>{
+    const f = e.target.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = ()=> { try { state = JSON.parse(r.result); saveState(state); toast('Datos importados.','ok'); render(); } catch(err){ toast('Archivo inválido.','err'); } };
+    r.readAsText(f);
+  });
+  $('#seedBtn').addEventListener('click', ()=>{
+    const now = Date.now();
+    state.students.forEach((s,i)=>{
+      for (let k=0;k<3;k++){
+        const amount = 50+Math.floor(Math.random()*300);
+        s.balance += amount;
+        state.movements.push({ id:uid('m'), studentId:s.id, kind:'deposit', amount, description:'Depósito ceremonial', responsible:'Grimwold', ts: now - Math.floor(Math.random()*6*86400000) });
+      }
+    });
+    saveState(state); toast('Datos demo sembrados.','ok'); render();
+  });
+  $('#resetBtn').addEventListener('click', ()=>{
+    if (!confirm('¿Restablecer toda la bóveda al estado demo? Se perderán los datos actuales.')) return;
+    localStorage.removeItem(STORE_KEY);
+    // Resetear solo los datos, no la sesión
+    const currentSession = state.session;
+    state = structuredClone(DEFAULT_STATE);
+    state.session = currentSession || { userId:'u-admin', role:'admin' };
+    saveState(state); toast('Bóveda restablecida al estado demo.','err'); render();
+  });
+  $('#nukeBtn').addEventListener('click', ()=>{
+    const code = prompt('⚠ Esto BORRARÁ todo el banco (estudiantes, movimientos, solicitudes, notificaciones y cuentas). Solo el Archimago sobrevivirá.\n\nEscribe REINICIAR para confirmar:');
+    if (code !== 'REINICIAR') { toast('Reinicio cancelado.','info'); return; }
+    const admin = state.users.find(u=>u.id==='u-admin') || DEFAULT_STATE.users[0];
+    state = {
+      users: [admin],
+      students: [],
+      movements: [],
+      depositRequests: [],
+      notifications: [{ id:uid('n'), type:'info', title:'Sistema reiniciado', msg:'La bóveda ha sido purificada por el Archimago.', ts:Date.now(), read:false }],
+      session: { userId: admin.id, role: admin.role },
+    };
+    saveState(state); toast('🔥 Sistema reiniciado por completo.','err'); route='dashboard'; render();
+  });
+}
+function openUserModal() {
+  showModal(`
+    <form id="userForm" class="space-y-4">
+      <div class="text-[11px] tracking-[0.28em] text-gold uppercase">Nueva cuenta</div>
+      <h3 class="font-display text-xl shimmer-text">Registrar acceso</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div><label class="label">Nombre</label><input class="input mt-1" name="name" required></div>
+        <div><label class="label">Usuario</label><input class="input mt-1" name="username" required></div>
+        <div><label class="label">Contraseña</label><input class="input mt-1" name="password" required></div>
+        <div><label class="label">Rol</label>
+          <select class="input mt-1" name="role">
+            <option value="duende">Duende (gestor bancario)</option>
+            <option value="estudiante">Estudiante (solo lectura)</option>
+            <option value="admin">Archimago (administrador)</option>
+          </select>
+        </div>
+        <div class="md:col-span-2 hidden" id="linkWrap">
+          <label class="label">Vincular a estudiante</label>
+          <select class="input mt-1" name="studentId">
+            <option value="">Ninguno</option>
+            ${state.students.map(s=>`<option value="${s.id}">${s.id} · ${s.name}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="text-[11px] text-violet-300/60 font-serifm italic">Los duendes gestionan bóvedas y estudiantes. Los estudiantes solo ven su propio pergamino.</div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button type="button" class="btn-ghost px-4 py-2 rounded-xl text-sm" onclick="closeModal()">Cancelar</button>
+        <button class="btn-gold px-4 py-2 rounded-xl text-sm">Crear cuenta</button>
+      </div>
+    </form>
+  `);
+  const roleSel = $('#userForm [name=role]');
+  const linkWrap = $('#linkWrap');
+  roleSel.addEventListener('change', ()=> linkWrap.classList.toggle('hidden', roleSel.value !== 'estudiante'));
+  $('#userForm').addEventListener('submit', e=>{
+    e.preventDefault();
+    const fd = Object.fromEntries(new FormData(e.target).entries());
+    if (state.users.find(u=>u.username.toLowerCase()===fd.username.toLowerCase())) return toast('Usuario ya existe.','err');
+    const u = { id:uid('u'), name:fd.name, username:fd.username, password:fd.password, role:fd.role, studentId: fd.studentId||null, createdAt:Date.now() };
+    state.users.push(u); saveState(state); closeModal(); toast('Cuenta creada.','gold'); render();
+  });
+}
+
+// ---------- STUDENT PORTAL ----------
+function viewStudentPortal(user) {
+  const s = state.students.find(x=>x.id===user.studentId) || state.students[0];
+  const movs = s ? state.movements.filter(m=>m.studentId===s.id).sort((a,b)=>b.ts-a.ts) : [];
+  const myReqs = s ? state.depositRequests.filter(r=>r.studentId===s.id).sort((a,b)=>b.ts-a.ts) : [];
+  const pendingSum = myReqs.filter(r=>r.status==='pending').reduce((a,r)=>a+r.amount,0);
+  const notifs = state.notifications.slice(0,5);
+  return `
+  <div class="min-h-screen">
+    <header class="glass-strong border-b border-violet-500/15 safe-top">
+      <div class="flex items-center gap-3 px-4 py-3">
+        ${LOGO(38)}
+        <div class="flex-1">
+          <div class="font-display text-sm tracking-[0.2em] shimmer-text">AURORA</div>
+          <div class="text-[10px] uppercase tracking-widest text-violet-300/70">Portal del estudiante</div>
+        </div>
+        <button id="logoutBtn" class="text-violet-300 hover:text-gold">${icon('logout')}</button>
+      </div>
+    </header>
+    <main class="px-4 md:px-8 py-6 max-w-3xl mx-auto space-y-6 fade-in">
+      ${s ? `
+      <div class="glass-strong rune-border rounded-3xl p-6 relative overflow-hidden">
+        <div class="absolute -top-20 -right-16 w-64 h-64 rounded-full opacity-30" style="background: radial-gradient(circle, rgba(201,162,76,.6), transparent 60%);"></div>
+        <div class="absolute inset-x-0 top-0 h-24 ${HOUSE_CLASS[s.house]} opacity-40"></div>
+        <div class="flex flex-col items-center text-center gap-4 relative pt-6">
+          <div class="w-28 h-28 rounded-3xl ${HOUSE_CLASS[s.house]} grid place-items-center text-4xl shadow-glow floaty overflow-hidden border-2 border-black/30">
+            ${s.photo?`<img src="${s.photo}" class="w-full h-full object-cover"/>`:s.avatar}
+          </div>
+          <div class="min-w-0 space-y-2">
+            <div class="text-[11px] uppercase tracking-[0.28em] text-gold">${s.id}</div>
+            <h1 class="font-display text-2xl md:text-3xl leading-tight">${s.name}</h1>
+            <div class="flex flex-wrap gap-2 justify-center">
+              <span class="badge badge-violet">${HOUSE_ICON[s.house]} ${s.house}</span>
+              <span class="badge ${s.status==='Activo'?'badge-emerald':'badge-rose'}">${s.status}</span>
+            </div>
+          </div>
+          <button id="editMyProfile" class="btn-ghost px-5 py-2.5 rounded-xl text-xs">✎ Editar mi perfil</button>
+        </div>
+        ${s.notes?`<p class="mt-4 text-sm text-violet-100/90 font-serifm italic text-center relative">"${s.notes}"</p>`:''}
+        <div class="mt-6 text-center relative">
+          <div class="text-[11px] uppercase tracking-widest text-violet-200/70">Tu bóveda personal</div>
+          <div class="font-display text-4xl md:text-5xl shimmer-text mt-2">${fmt(s.balance)} G</div>
+          ${pendingSum? `<div class="text-[11px] text-gold/80 mt-2">+${fmt(pendingSum)} G pendientes de verificación</div>`:''}
+        </div>
+      </div>
+
+      <div class="glass rune-border rounded-2xl p-5">
+        <div class="flex items-center justify-between mb-3">
+          <div class="font-display text-lg">Solicitar depósito</div>
+          <span class="badge badge-violet">Verificado por un duende</span>
+        </div>
+        <p class="text-[12px] text-violet-200/70 font-serifm italic mb-3">Cuando los duendes no estén conectados, registra aquí tu depósito. El Archimago o un duende lo verificará antes de acreditarlo.</p>
+        <form id="reqForm" class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div class="md:col-span-1"><label class="label">Monto (G)</label><input class="input mt-1" name="amount" type="number" min="1" placeholder="Monto" required></div>
+          <div class="md:col-span-2"><label class="label">Descripción</label><input class="input mt-1" name="description" placeholder="Motivo o comprobante"></div>
+          <button class="btn-gold md:col-span-3 px-4 py-2.5 rounded-xl text-sm">${icon('coin','w-4 h-4')} Enviar solicitud</button>
+        </form>
+      </div>
+
+      <div class="glass rune-border rounded-2xl p-5">
+        <div class="font-display text-lg mb-3">Mis solicitudes</div>
+        ${myReqs.length ? `<div class="space-y-2">${myReqs.map(r=>`
+          <div class="flex items-center gap-3 p-3 rounded-xl bg-white/[.03]">
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-medium">+${fmt(r.amount)} G <span class="text-violet-300/60 text-xs">· ${fmtDate(r.ts)}</span></div>
+              <div class="text-[11px] text-violet-300/60 truncate">${r.description||'Sin descripción'}${r.reviewNote?` · Nota: ${r.reviewNote}`:''}</div>
+            </div>
+            ${reqStatusBadge(r.status)}
+          </div>`).join('')}</div>`
+          : `<div class="text-center py-6 text-violet-300/60 font-serifm italic">Aún no has enviado solicitudes.</div>`}
+      </div>
+
+      <div class="glass rune-border rounded-2xl p-5">
+        <div class="font-display text-lg mb-3">Historial bancario</div>
+        ${movs.length ? `<div class="space-y-2">${movs.map(mvRow).join('')}</div>` : `<div class="text-center py-8 text-violet-300/60 font-serifm italic">Aún no hay movimientos en tu bóveda.</div>`}
+      </div>` : `<div class="glass rune-border rounded-2xl p-6 text-center">Tu cuenta aún no está vinculada. Contacta a un duende.</div>`}
+
+      <div class="glass rune-border rounded-2xl p-5">
+        <div class="font-display text-lg mb-3">Notificaciones del banco</div>
+        ${notifs.length ? notifs.map(n=>`<div class="p-3 rounded-xl bg-white/[.03] mb-2"><div class="text-sm font-semibold">${n.title}</div><div class="text-xs text-violet-200/80">${n.msg}</div><div class="text-[10px] text-violet-300/50 uppercase tracking-widest mt-1">${fmtDate(n.ts)}</div></div>`).join('') : `<div class="text-center py-6 text-violet-300/60 font-serifm italic">Sin avisos por ahora.</div>`}
+      </div>
+      ${FOOTER()}
+    </main>
+    ${modalHost()}
+  </div>`;
+}
+function wireStudentPortal() {
+  $('#logoutBtn').addEventListener('click', doLogout);
+  $('#editMyProfile')?.addEventListener('click', openProfileEditor);
+  const form = $('#reqForm');
+  if (form) form.addEventListener('submit', e=>{
+    e.preventDefault();
+    const user = currentUser();
+    const s = state.students.find(x=>x.id===user.studentId);
+    if (!s) return toast('Tu cuenta no está vinculada a un estudiante.','err');
+    const fd = Object.fromEntries(new FormData(e.target).entries());
+    const amount = Math.max(0, parseFloat(fd.amount)||0);
+    if (!amount) return toast('Monto inválido.','err');
+    state.depositRequests.push({ id:uid('r'), studentId:s.id, amount, description:fd.description||'', ts:Date.now(), status:'pending' });
+    notify('Nueva solicitud de depósito', `${s.name} solicita +${fmt(amount)} G`, 'info');
+    saveState(state); toast('Solicitud enviada. Espera verificación.','gold');
+    e.target.reset(); render();
+  });
+}
+
+// ---------- PROFILE (admin / duende / estudiante) ----------
+function viewProfile() {
+  const u = currentUser();
+  const linked = u.studentId ? state.students.find(x=>x.id===u.studentId) : null;
+  // Perfil temático: admin usa dorado; usuarios con estudiante usan colores de casa
+  const house = linked?.house || 'Solaris';
+  const houseCls = u.role === 'admin'
+    ? 'bg-gradient-to-br from-amber-500 via-yellow-600 to-amber-800'
+    : HOUSE_CLASS[house];
+  const icon = u.role==='admin' ? '👑' : (linked?.avatar || (u.role==='duende'?'ᚱ':'★'));
+  const photo = u.photo || linked?.photo || '';
+  const bio = u.bio ?? (linked?.notes || '');
+  const balance = linked ? linked.balance : null;
+
+  return `
+  <div class="space-y-6 max-w-3xl mx-auto">
+    <div>
+      <div class="text-[11px] tracking-[0.3em] text-gold uppercase">Ficha Arcana</div>
+      <h1 class="font-display text-2xl md:text-3xl mt-1 shimmer-text">Mi Perfil</h1>
+    </div>
+
+    <div class="glass-strong rune-border rounded-3xl overflow-hidden relative">
+      <div class="${houseCls} h-32 relative">
+        <div class="absolute inset-0 opacity-30" style="background: radial-gradient(circle at 20% 30%, rgba(255,255,255,.4), transparent 40%), radial-gradient(circle at 80% 70%, rgba(201,162,76,.5), transparent 50%);"></div>
+        <div class="absolute top-3 right-4 text-[10px] tracking-[0.3em] uppercase text-white/70">${u.role==='admin'?'Archimago':u.role==='duende'?'Duende Bancario':'Hechicero'}</div>
+      </div>
+      <div class="px-6 pb-6 -mt-14 relative">
+        <div class="flex items-end gap-4">
+          <div class="w-28 h-28 rounded-3xl ${houseCls} grid place-items-center text-5xl shadow-glow border-4 border-black/40 overflow-hidden">
+            ${photo?`<img src="${photo}" class="w-full h-full object-cover"/>`:icon}
+          </div>
+          <div class="flex-1 min-w-0 pb-2">
+            <h2 class="font-display text-2xl md:text-3xl">${u.name}</h2>
+            <div class="text-[11px] text-gold uppercase tracking-widest">@${u.username}</div>
+          </div>
+        </div>
+
+        <div class="mt-4 flex flex-wrap gap-2">
+          ${linked?`<span class="badge badge-violet">${HOUSE_ICON[house]} ${house}</span>`:''}
+          ${linked?`<span class="badge badge-gold">${linked.id}</span>`:''}
+          <span class="badge ${u.role==='admin'?'badge-gold':u.role==='duende'?'badge-violet':'badge-emerald'}">${u.role}</span>
+          ${balance!==null?`<span class="badge badge-gold">💰 ${fmt(balance)} G</span>`:''}
+        </div>
+
+        <div class="mt-4 glass rounded-2xl p-4">
+          <div class="label mb-2">Sobre mí</div>
+          <p class="text-sm text-violet-100/90 font-serifm italic">${bio ? bio : '<span class="text-violet-300/50 not-italic">Sin descripción aún. Edita tu perfil y cuenta algo sobre ti…</span>'}</p>
+        </div>
+
+        <div class="mt-4 flex justify-end">
+          <button id="editProfileBtn" class="btn-gold px-5 py-2.5 rounded-xl text-sm">✎ Editar mi perfil</button>
+        </div>
+      </div>
+    </div>
+
+    ${u.role==='admin'?`
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        ${kpi('Estudiantes', state.students.length, 'users')}
+        ${kpi('Cuentas', state.users.length, 'key')}
+        ${kpi('Movimientos', state.movements.length, 'book')}
+        ${kpi('Saldo Total', fmt(state.students.reduce((a,s)=>a+s.balance,0))+' G', 'vault')}
+      </div>`:''}
+  </div>
+  ${modalHost()}`;
+}
+function wireProfile() {
+  $('#editProfileBtn').addEventListener('click', openProfileEditor);
+}
+function openProfileEditor() {
+  const u = currentUser();
+  const linked = u.studentId ? state.students.find(x=>x.id===u.studentId) : null;
+  const currentPhoto = u.photo || linked?.photo || '';
+  const currentBio = u.bio ?? linked?.notes ?? '';
+  const isStudent = u.role === 'estudiante';
+  showModal(`
+    <form id="profileForm" class="space-y-5">
+      <div>
+        <div class="text-[11px] tracking-[0.28em] text-gold uppercase">Editar perfil</div>
+        <h3 class="font-display text-xl shimmer-text mt-1">${u.name}</h3>
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-center gap-4 glass rounded-2xl p-4">
+        <div id="photoPreview" class="w-24 h-24 rounded-2xl bg-violet-900/40 grid place-items-center overflow-hidden text-3xl shrink-0 border border-violet-500/25">
+          ${currentPhoto?`<img src="${currentPhoto}" class="w-full h-full object-cover"/>`:'📷'}
+        </div>
+        <div class="flex-1 w-full">
+          <label class="label">Foto de perfil</label>
+          <input class="input mt-1" type="file" name="photoFile" accept="image/*">
+          <p class="text-[11px] text-violet-300/60 mt-1">Elige una imagen desde tu dispositivo.</p>
+        </div>
+      </div>
+
+      <div>
+        <label class="label">Nombre visible</label>
+        <input class="input mt-1" name="name" value="${u.name}" required>
+      </div>
+
+      <div>
+        <label class="label">Descripción / Sobre mí</label>
+        <textarea class="input mt-1" name="bio" rows="4" placeholder="Cuenta algo mágico sobre ti…">${currentBio}</textarea>
+      </div>
+
+      ${isStudent?`
+      <div class="glass rounded-2xl p-4 space-y-3">
+        <div class="label">Cambiar contraseña (4 dígitos)</div>
+        <p class="text-[11px] text-violet-300/60">Deja vacío si no deseas cambiarla. Debe ser exactamente 4 números.</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div><label class="label">Nueva clave</label><input class="input mt-1 tracking-[0.5em] text-center" name="pin1" type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="••••"></div>
+          <div><label class="label">Confirmar clave</label><input class="input mt-1 tracking-[0.5em] text-center" name="pin2" type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="••••"></div>
+        </div>
+      </div>`:''}
+
+      <div class="flex justify-end gap-2 pt-1">
+        <button type="button" class="btn-ghost px-4 py-2 rounded-xl text-sm" onclick="closeModal()">Cancelar</button>
+        <button class="btn-gold px-4 py-2 rounded-xl text-sm">Guardar cambios</button>
+      </div>
+    </form>
+  `);
+  const fileInput = $('#profileForm [name=photoFile]');
+  fileInput.addEventListener('change', ()=>{
+    const f = fileInput.files?.[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = ()=>{ $('#photoPreview').innerHTML = `<img src="${r.result}" class="w-full h-full object-cover"/>`; };
+    r.readAsDataURL(f);
+  });
+  $('#profileForm').addEventListener('submit', async e=>{
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const name = fd.get('name')?.toString().trim() || u.name;
+    const bio = fd.get('bio')?.toString() || '';
+    const file = fd.get('photoFile');
+    let photo = currentPhoto;
+    if (file && file.size) {
+      photo = await new Promise(res=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.readAsDataURL(file); });
+    }
+    if (isStudent) {
+      const pin1 = (fd.get('pin1')||'').toString().trim();
+      const pin2 = (fd.get('pin2')||'').toString().trim();
+      if (pin1 || pin2) {
+        if (!/^[0-9]{4}$/.test(pin1)) return toast('La clave debe tener exactamente 4 dígitos.','err');
+        if (pin1 !== pin2) return toast('Las claves no coinciden.','err');
+        u.password = pin1;
+      }
+    }
+    u.name = name;
+    u.bio = bio;
+    u.photo = photo;
+    if (linked) { linked.name = name; linked.notes = bio; linked.photo = photo; }
+    saveState(state); closeModal(); toast('Perfil actualizado ✦','gold'); render();
+  });
+}
+
+
+// ---------- MODAL ----------
+function modalHost() { return `<div id="modalHost"></div>`; }
+function showModal(html) {
+  const host = $('#modalHost');
+  if (!host) return;
+  host.innerHTML = `
+    <div class="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-4 fade-in">
+      <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeModal()"></div>
+      <div class="relative w-full md:max-w-2xl glass-strong rune-border rounded-t-3xl md:rounded-3xl p-6 max-h-[92vh] overflow-y-auto safe-bottom">
+        ${html}
+      </div>
+    </div>`;
+}
+function closeModal() { const h=$('#modalHost'); if (h) h.innerHTML=''; }
+window.closeModal = closeModal;
+
+// ---------- BOOT ----------
+// Inicializar el estado desde Supabase antes de renderizar
+initState().then(() => {
+  // Verificar si la sesión sigue siendo válida
+  if (state.session) {
+    const user = state.users.find(u => u.id === state.session.userId);
+    if (!user) {
+      state.session = null;
+      saveState(state);
+    }
+  }
+  render();
+}).catch(err => {
+  console.error('Error inicializando:', err);
+  // Fallback: usar estado local
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (raw) state = JSON.parse(raw);
+    else state = structuredClone(DEFAULT_STATE);
+  } catch(e) {
+    state = structuredClone(DEFAULT_STATE);
+  }
+  render();
+});
+</script>
+</body>
+</html>
